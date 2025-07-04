@@ -479,6 +479,31 @@
     border: 1px solid #ddd;
     border-radius: 5px;
 }
+/* Document Converter Styles */
+#textContent {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    resize: vertical;
+}
+
+.document-preview {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.document-preview pre {
+    white-space: pre-wrap;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    margin: 0;
+}
     </style>
 </head>
 <body>
@@ -511,7 +536,7 @@
                     <div class="converter-area" id="dropArea">
                         <div class="upload-icon">📤</div>
                         <input type="file" id="fileInput" class="file-input" accept="image/*">
-                        <button class="upload-btn" id="uploadBtn">Choose an Image</button>
+                        <button class="upload-btn" id="uploadBtn">Choose an File</button>
                         <p>or drag & drop your file here</p>
                         <div class="file-info" id="fileInfo"></div>
                     </div>
@@ -569,6 +594,27 @@
         </select>
     </div>
 </div>
+<div class="format-option" data-format="docx">DOCX</div>
+<div class="format-option" data-format="xlsx">XLSX</div>
+<div class="format-option" data-format="txt">TXT</div>
+<div class="format-option" data-format="pdf">PDF</div>
+<!-- Document Conversion Options -->
+<div class="pdf-options" id="docOptions" style="display: none;">
+    <h3>Document Options</h3>
+    <div class="option-group">
+        <label>Conversion Type:</label>
+        <select id="docConversionType">
+            <option value="text-to-doc">Text to Document</option>
+            <option value="doc-to-text">Document to Text</option>
+            <option value="excel-to-text">Excel to Text</option>
+            <option value="text-to-excel">Text to Excel</option>
+        </select>
+    </div>
+    <div class="option-group" id="textContentGroup" style="display: none;">
+        <label>Text Content:</label>
+        <textarea id="textContent" rows="4" placeholder="Enter text to convert"></textarea>
+    </div>
+</div>
             <section class="features">
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
@@ -592,7 +638,7 @@
     </div>
     
     <footer>
-        <p>© 2023 PixelPlay - The Fun Image Converter | All Rights Reserved</p>
+        <p>© 2025 IBP - The Fun Image Converter | All Rights Reserved</p>
     </footer>
     
     <script>
@@ -800,6 +846,91 @@ async function convertImageToPDF(file) {
 async function convertPDFToImages(file, pages, quality) {
     // Use a library like pdf.js or pdf-lib
     // Return array of image blobs or zip file
+}
+// Add this to your format selection handler
+formatOptions.forEach(option => {
+    option.addEventListener('click', function() {
+        // ... existing code ...
+        
+        // Show/hide document options
+        const docOptions = document.getElementById('docOptions');
+        docOptions.style.display = ['docx', 'xlsx', 'txt'].includes(this.dataset.format) ? 'block' : 'none';
+        
+        // Show/hide text area based on format
+        const textContentGroup = document.getElementById('textContentGroup');
+        textContentGroup.style.display = this.dataset.format === 'txt' ? 'block' : 'none';
+    });
+});
+
+// Add event listener for conversion type change
+document.getElementById('docConversionType').addEventListener('change', function() {
+    const textContentGroup = document.getElementById('textContentGroup');
+    textContentGroup.style.display = this.value.includes('text-to-') ? 'block' : 'none';
+});
+
+// Update your convertFile function to handle documents
+async function convertFile() {
+    if (['docx', 'xlsx', 'txt'].includes(selectedFormat)) {
+        const conversionType = document.getElementById('docConversionType').value;
+        
+        // Show progress
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+        progressText.textContent = 'Converting: 0%';
+        
+        // Simulate conversion progress
+        await simulateConversion();
+        
+        // Get the converted file (simulated)
+        let convertedFile;
+        if (conversionType === 'text-to-doc') {
+            convertedFile = await convertTextToDoc();
+        } else if (conversionType === 'doc-to-text') {
+            convertedFile = await convertDocToText();
+        } else if (conversionType === 'excel-to-text') {
+            convertedFile = await convertExcelToText();
+        } else if (conversionType === 'text-to-excel') {
+            convertedFile = await convertTextToExcel();
+        }
+        
+        // Show download button
+        showDownloadButton(convertedFile);
+    } else if (selectedFormat.includes('pdf')) {
+        // Existing PDF conversion logic
+    } else {
+        // Existing image conversion logic
+    }
+}
+
+// Simulated document conversion functions
+async function convertTextToDoc() {
+    // In a real implementation, use a library like docx
+    const text = document.getElementById('textContent').value || "Sample document content";
+    return new Blob([text], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+
+async function convertDocToText() {
+    // In a real implementation, use a library like mammoth.js
+    const text = await selectedFile.text();
+    return new Blob([text], { type: 'text/plain' });
+}
+
+async function convertExcelToText() {
+    // In a real implementation, use a library like xlsx
+    const text = "Simulated Excel to text conversion\nColumn1,Column2\nValue1,Value2";
+    return new Blob([text], { type: 'text/plain' });
+}
+
+async function convertTextToExcel() {
+    // In a real implementation, use a library like xlsx
+    const text = document.getElementById('textContent').value || "Sample,Data\n1,2\n3,4";
+    return new Blob([text], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+
+// Update showDownloadButton to accept the converted file
+function showDownloadButton(convertedBlob) {
+    // ... existing code ...
+    // Just use the passed convertedBlob instead of creating a new one
 }
     </script>
 </body>
